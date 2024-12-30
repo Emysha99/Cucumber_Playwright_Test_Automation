@@ -33,7 +33,7 @@ demonstrate effective test automation strategies using modern tools and methodol
 3. Install dependencies:
    
    ```bash
-   npm install   # For Playwright
+   yarn install   # For Playwright
    mvn install   # For Maven
 4. Execute the tests.
       - UI tests :
