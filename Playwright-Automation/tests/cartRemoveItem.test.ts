@@ -3,7 +3,6 @@ import { login } from './loginHelper';
 
 test.describe('Cart Item Removal', () => {
     test.beforeEach(async ({ page }) => {
-        // Log in before each test
         await login(page);
     });
 
