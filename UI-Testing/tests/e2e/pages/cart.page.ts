@@ -1,27 +1,35 @@
 import { Page } from '@playwright/test';
 
 export class CartPage {
-    readonly cartBadge;
-    readonly cartItems;
-    readonly cartLink;
+  constructor(private page: Page) {}
 
-    constructor(private page: Page) {
-        this.cartBadge = page.locator('.shopping_cart_badge');
-        this.cartItems = page.locator('.cart_item');
-        this.cartLink = page.locator('.shopping_cart_link');
-    }
+  async navigate() {
+    await this.page.goto('https://www.saucedemo.com/cart.html');
+  }
 
-    async addToCart(productName: string) {
-        const productContainer = this.page.locator('.inventory_item', { hasText: productName });
-        await productContainer.locator('button', { hasText: 'Add to cart' }).click();
-    }
+  async getCartItemCount(): Promise<number> {
+    return await this.page.locator('.cart_item').count();
+  }
 
-    async removeFromCart(productName: string) {
-        const productContainer = this.page.locator('.inventory_item', { hasText: productName });
-        await productContainer.locator('button', { hasText: 'Remove' }).click();
-    }
+  async getCartBadgeText(): Promise<string> {
+    return await this.page.locator('.shopping_cart_badge').innerText();
+  }
 
-    async viewCart() {
-        await this.cartLink.click();
-    }
-} 
+  async removeItem(itemName: string) {
+    const item = this.page.locator('.cart_item').filter({ hasText: itemName });
+    await item.locator('button').click();
+  }
+
+  async checkout() {
+    await this.page.click('#checkout');
+  }
+
+  async addToCart(itemName: string) {
+    const item = this.page.locator('.inventory_item').filter({ hasText: itemName });
+    await item.locator('button:has-text("Add to cart")').click();
+  }
+
+  async viewCart() {
+    await this.page.click('.shopping_cart_link');
+  }
+}
