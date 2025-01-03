@@ -1,5 +1,6 @@
 package org.example.itqaassignment.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.options.RequestOptions;
@@ -9,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.example.itqaassignment.util.ApiRequestHandler;
+
+import java.util.List;
 
 @Service
 public class BookApiService {
@@ -26,8 +29,21 @@ public class BookApiService {
                 RequestOptions.create().setData(book.toMap())), "Creating new book: " + book, logger);
     }
 
+    public APIResponse getBooks() {
+        return ApiRequestHandler.handleApiRequest(() -> playwrightConfig.getRequest().get("/api/books"), "Fetching all books", logger);
+    }
+
+    public APIResponse getBook(String id) {
+        return ApiRequestHandler.handleApiRequest(() -> playwrightConfig.getRequest().get("/api/books/" + id), "Fetching book with ID: " + id,logger);
+    }
+
     public Book extractBookFromResponse(APIResponse response) throws Exception {
         return objectMapper.readValue(response.text(), Book.class);
     }
 
-} 
+    public List<Book> parseBookList(APIResponse response) throws Exception {
+        return objectMapper.readValue(response.text(),
+                new TypeReference<List<Book>>() {
+                });
+    }
+}
