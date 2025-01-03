@@ -2,9 +2,9 @@ name: Cucumber Test Automation
 
 on:
   push:
-    branches: [ "01.01.2025" ]
+    branches: [ "dev" ]
   pull_request:
-    branches: [ "01.01.2025" ]
+    branches: [ "dev" ]
 
 permissions:
   contents: write
