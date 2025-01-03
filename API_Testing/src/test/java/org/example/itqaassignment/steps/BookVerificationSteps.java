@@ -26,4 +26,10 @@ public class BookVerificationSteps extends BaseSteps {
             throw new AssertionError("Failed to process book details: " + e.getMessage());
         }
     }
+
+    @Then("the book should be deleted successfully")
+    public void the_book_should_be_deleted_successfully() {
+        APIResponse response = ResponseManager.getInstance().getResponse();
+        assert response.ok() : "Expected successful response, but got " + response.status();
+    }
 }
