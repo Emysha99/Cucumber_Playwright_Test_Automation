@@ -1,10 +1,11 @@
-name: Cucumber Test Automation
+name: Combined UI and API Testing
 
 on:
   push:
     branches: [ "204165T-2" ]
   pull_request:
     branches: [ "204165T-2" ]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -12,11 +13,52 @@ permissions:
   id-token: write
 
 jobs:
-  build-and-test:
+  ui-testing:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    
+    defaults:
+      run:
+        working-directory: UI-Testing
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+          cache-dependency-path: 'UI-Testing/yarn.lock'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Install xvfb
+        run: sudo apt-get install -y xvfb
+
+      - name: Run Playwright tests
+        run: xvfb-run --auto-servernum yarn test
+        continue-on-error: true
+        env:
+          CI: true
+
+      - name: Generate UI Allure Report
+        run: yarn allure:generate
+        if: always()
+
+      - name: Upload UI Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: ui-allure-results
+          path: UI-Testing/allure-report
+          retention-days: 30
+
+  api-testing:
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -41,118 +83,81 @@ jobs:
           cd libs
           java -Dserver.port=7081 -jar demo-0.0.1-SNAPSHOT.jar &
           echo "Waiting for application to start..."
-          
           USERNAME="admin"
           PASSWORD="password"
           AUTH=$(echo -n "$USERNAME:$PASSWORD" | base64)
-          
           timeout 60 bash -c "while [[ \"\$(curl -s -o /dev/null -w '%{http_code}' -H \"Authorization: Basic $AUTH\" 127.0.0.1:7081/api/books)\" != \"200\" ]]; do sleep 5; done" || true
-          
           echo "Application is running!"
           cd ..
         continue-on-error: true
 
-      - name: Create Allure Directories
-        if: always()
-        working-directory: API_Testing
-        run: |
-          mkdir -p target/allure-results
-          mkdir -p allure-report
-          chmod -R 777 target
-        continue-on-error: true
-
-      - name: Run Tests
-        id: tests
+      - name: Run API Tests
+        id: api-tests
         working-directory: API_Testing
         run: mvn test
         continue-on-error: true
 
-      - name: Debug Test Results
+      - name: Generate API Allure Report
         if: always()
         working-directory: API_Testing
-        run: |
-          echo "Test Results Directory Content:"
-          ls -la target/ || true
-          echo "Allure Results Content:"
-          ls -la target/allure-results/ || true
+        run: mvn allure:report
         continue-on-error: true
 
-      - name: Generate Allure Report with Maven
-        if: always()
-        working-directory: API_Testing
-        run: |
-          echo "Generating Allure report with Maven..."
-          mvn allure:report
-          
-          # Debug information
-          echo "Maven target directory contents:"
-          ls -la target/
-          
-          # Create GitHub Pages directory
-          mkdir -p target/github-pages
-          
-          # Try both possible locations for Allure report
-          if [ -d "target/site/allure-maven-plugin" ]; then
-            echo "Maven Allure report generated successfully"
-            cp -r target/site/allure-maven-plugin/* target/github-pages/
-          else
-            echo "Maven Allure report generation failed, falling back to CLI"
-            # Install Allure CLI
-            curl -o allure-2.24.0.tgz -OLs https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.24.0/allure-commandline-2.24.0.tgz
-            tar -zxvf allure-2.24.0.tgz -C /tmp
-            sudo ln -s /tmp/allure-2.24.0/bin/allure /usr/local/bin/allure
-            
-            # Generate report using Allure CLI
-            allure generate target/allure-results -o target/github-pages --clean
-          fi
-          
-          # Debug information
-          echo "GitHub Pages directory contents:"
-          ls -la target/github-pages/
-          
-          # Create .nojekyll file
-          touch target/github-pages/.nojekyll
-          
-          # Ensure we have something to deploy
-          if [ ! -f target/github-pages/index.html ]; then
-            echo "<html><body><h1>Test Results</h1><pre>" > target/github-pages/index.html
-            echo "Test execution status: ${{ steps.tests.outcome }}" >> target/github-pages/index.html
-            echo "</pre></body></html>" >> target/github-pages/index.html
-          fi
-        continue-on-error: true
-
-      - name: Setup Pages
-        if: always()
-        uses: actions/configure-pages@v3
-        continue-on-error: true
-
-      - name: Upload Pages artifact
-        if: always()
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: 'API_Testing/target/github-pages'
-        continue-on-error: true
-
-      - name: Deploy to GitHub Pages
-        if: always()
-        id: deployment
-        uses: actions/deploy-pages@v2
-        continue-on-error: true
-
-      - name: Store Allure Report
+      - name: Upload API Test Results
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: allure-report
-          path: |
-            API_Testing/target/site/allure-maven-plugin/
-            API_Testing/target/allure-results/
+          name: api-allure-results
+          path: API_Testing/target/site/allure-maven-plugin
           retention-days: 30
-        continue-on-error: true
+
+  combine-reports:
+    needs: [ui-testing, api-testing]
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download UI Results
+        uses: actions/download-artifact@v3
+        with:
+          name: ui-allure-results
+          path: combined-report/ui
+
+      - name: Download API Results
+        uses: actions/download-artifact@v3
+        with:
+          name: api-allure-results
+          path: combined-report/api
+
+      - name: Combine Reports
+        run: |
+          mkdir -p combined-report/merged
+          echo "<html><head><title>Combined Test Reports</title></head><body>" > combined-report/merged/index.html
+          echo "<h1>Combined Test Reports</h1>" >> combined-report/merged/index.html
+          echo "<h2><a href='ui/'>UI Test Report</a></h2>" >> combined-report/merged/index.html
+          echo "<h2><a href='api/'>API Test Report</a></h2>" >> combined-report/merged/index.html
+          echo "</body></html>" >> combined-report/merged/index.html
+          cp -r combined-report/ui combined-report/merged/ui
+          cp -r combined-report/api combined-report/merged/api
+          touch combined-report/merged/.nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: combined-report/merged
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+        if: always()
 
       - name: Print Test Status
         if: always()
         run: |
-          echo "Test execution completed with status: ${{ steps.tests.outcome }}"
-          echo "Allure report should be available at: ${{ steps.deployment.outputs.page_url }}"
-        continue-on-error: true
+          echo "Test execution completed"
+          echo "Combined report should be available at: ${{ steps.deployment.outputs.page_url }}"
