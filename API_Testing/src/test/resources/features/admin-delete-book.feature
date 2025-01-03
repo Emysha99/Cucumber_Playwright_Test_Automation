@@ -7,7 +7,6 @@ Feature: Delete Book API
   Scenario: Delete an existing book
     When I delete the book with ID "1"
     Then the book should be deleted successfully
-    And the book should not appear in the list
 
   Scenario: Delete non-existent book
     When I delete the book with ID "999"

@@ -37,6 +37,10 @@ public class BookApiService {
         return ApiRequestHandler.handleApiRequest(() -> playwrightConfig.getRequest().get("/api/books/" + id), "Fetching book with ID: " + id,logger);
     }
 
+    public APIResponse deleteBook(String id) {
+        return ApiRequestHandler.handleApiRequest(() -> playwrightConfig.getRequest().delete("/api/books/" + id), "Deleting book with ID: " + id, logger);
+    }
+
     public Book extractBookFromResponse(APIResponse response) throws Exception {
         return objectMapper.readValue(response.text(), Book.class);
     }

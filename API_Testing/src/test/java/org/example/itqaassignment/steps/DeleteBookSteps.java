@@ -1,8 +1,8 @@
-package org.example.itqaassitgnment.steps;
+package org.example.itqaassignment.steps;
 
 import com.microsoft.playwright.APIResponse;
 import io.cucumber.java.en.When;
-import org.example.itqaassitgnment.model.Book;
+import org.example.itqaassignment.model.Book;
 
 public class DeleteBookSteps extends BaseSteps {
     private APIResponse response;
