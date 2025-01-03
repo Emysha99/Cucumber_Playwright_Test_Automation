@@ -45,6 +45,11 @@ public class BookApiService {
         return objectMapper.readValue(response.text(), Book.class);
     }
 
+    public APIResponse updateBook(Book book) {
+        return ApiRequestHandler.handleApiRequest(() -> playwrightConfig.getRequest().put("/api/books/" + book.getId(),
+                RequestOptions.create().setData(book.toMap())), "Updating book: " + book, logger);
+    }
+
     public List<Book> parseBookList(APIResponse response) throws Exception {
         return objectMapper.readValue(response.text(),
                 new TypeReference<List<Book>>() {
