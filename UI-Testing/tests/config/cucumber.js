@@ -6,7 +6,7 @@ module.exports = {
     format: [
       'progress',
       '@cucumber/pretty-formatter',
-      path.resolve('./tests/e2e/support/allure-reporter')
+      'node_modules/allure-cucumberjs'
     ],
     paths: ['tests/e2e/features/**/*.feature'],
     requireModule: ['ts-node/register'],
