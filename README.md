@@ -4,13 +4,14 @@
 This project is part of our IS3440 IT Quality Assurance module. The assignment involves **test automation** for both **UI** and **API testing**. The goal is to implement and 
 demonstrate effective test automation strategies using modern tools and methodologies.
 ## Group Members
-- 204165T - ⁠Premanayake M.M.D.D
-- 204050L - Ekanayaka E.M.S.P
-- 204147P - Nuwantha K.A.C
-- 204114M - Lamahewage D.R.
-- 204117B - Madhubhashini P.H.A.E
-- 204109D - Kumarasingha M.M.J.S
-
+| Index Number | Name                        | GitHub Username     |
+|--------------|-----------------------------|---------------------|
+| 204165T      | Premanayake M.M.D.D        | Diniranga |
+| 204050L      | Ekanayaka E.M.S.P          | SamadhiEkanayaka |
+| 204147P      | Nuwantha K.A.C             | ChamikaNuwantha |
+| 204114M      | Lamahewage D.R.            | lamahewageDulani |
+| 204117B      | Madhubhashini P.H.A.E      | Emysha99 |
+| 204109D      | Kumarasingha M.M.J.S       | janithkumarasingha |
 ## Tools and Frameworks
 - **Cucumber**: Used for Behavior-Driven Development (BDD) to write human-readable test scenarios.
 - **Playwright**: A modern test automation framework for reliable, fast, and scalable UI testing.
