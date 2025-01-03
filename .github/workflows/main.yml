@@ -36,9 +36,14 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
+      - name: Install xvfb
+        run: sudo apt-get install -y xvfb
+
       - name: Run Playwright tests
-        run: yarn test
+        run: xvfb-run --auto-servernum yarn test
         continue-on-error: true  # This ensures the workflow continues even if tests fail
+        env:
+          CI: true
 
       - name: Generate Allure Report
         run: yarn allure:generate
