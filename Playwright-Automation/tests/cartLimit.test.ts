@@ -3,23 +3,26 @@ import { login } from './loginHelper';
 
 test.describe('Invalid Cart Limit Test', () => {
   test.beforeEach(async ({ page }) => {
+    // Perform login before each test
     await login(page);
   });
 
   test('Cannot add more than three items to the cart', async ({ page }) => {
+    // Navigate to the inventory page
     await page.goto('https://www.saucedemo.com/v1/inventory.html');
 
+    // Select all items on the page
     const items = page.locator('.inventory_item');
     const addToCartButtons = items.locator('text=Add to cart');
 
     // Add three items to the cart
     for (let i = 0; i < 3; i++) {
-      await addToCartButtons.nth(i).click(); 
+      await addToCartButtons.nth(i).click(); // Add item
       console.log(`Item ${i + 1} added to cart.`);
     }
 
     // Attempt to add a fourth item
-    await addToCartButtons.nth(3).click(); 
+    await addToCartButtons.nth(3).click(); // Try to add a fourth item
     console.log('Attempted to add a fourth item to the cart.');
 
     // Navigate to the cart page
@@ -32,7 +35,7 @@ test.describe('Invalid Cart Limit Test', () => {
     console.log('Verified only three items are in the cart.');
 
     // Check for any error message or restriction
-    const errorMessage = page.locator('text=Cannot add more than three items'); 
+    const errorMessage = page.locator('text=Cannot add more than three items'); // Update if the app has a specific error message
     if (await errorMessage.isVisible()) {
       console.log('Error message displayed: Cannot add more than three items.');
     } else {
