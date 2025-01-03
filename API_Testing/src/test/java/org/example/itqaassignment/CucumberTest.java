@@ -18,4 +18,4 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
             "json:target/cucumber-reports/Cucumber.json")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "org.example.itqaassignment")
 public class CucumberTest {
-} 
+}

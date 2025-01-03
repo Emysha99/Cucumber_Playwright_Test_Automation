@@ -32,13 +32,13 @@ jobs:
 
       - name: Build with Maven
         run: |
-          cd API-Testing
-          mvn clean compile -DskipTests
+          cd API_Testing
+          ./mvnw clean compile -DskipTests
         continue-on-error: true
 
       - name: Start Application
         run: |
-          cd API-Testing/libs
+          cd API_Testing/libs
           java -Dserver.port=7081 -jar demo-0.0.1-SNAPSHOT.jar &
           echo "Waiting for application to start..."
           
@@ -54,7 +54,7 @@ jobs:
       - name: Create Allure Directories
         if: always()
         run: |
-          cd API-Testing
+          cd API_Testing
           mkdir -p target/allure-results
           mkdir -p allure-report
           chmod -R 777 target
@@ -63,14 +63,14 @@ jobs:
       - name: Run Tests
         id: tests
         run: |
-          cd API-Testing
-          mvn test
+          cd API_Testing
+          ./mvnw test
         continue-on-error: true
 
       - name: Debug Test Results
         if: always()
         run: |
-          cd API-Testing
+          cd API_Testing
           echo "Test Results Directory Content:"
           ls -la target/ || true
           echo "Allure Results Content:"
@@ -80,9 +80,9 @@ jobs:
       - name: Generate Allure Report with Maven
         if: always()
         run: |
-          cd API-Testing
+          cd API_Testing
           echo "Generating Allure report with Maven..."
-          mvn allure:report
+          ./mvnw allure:report
           
           # Debug information
           echo "Maven target directory contents:"
@@ -130,7 +130,7 @@ jobs:
         if: always()
         uses: actions/upload-pages-artifact@v2
         with:
-          path: 'API-Testing/target/github-pages'
+          path: 'API_Testing/target/github-pages'
         continue-on-error: true
 
       - name: Deploy to GitHub Pages
@@ -147,8 +147,8 @@ jobs:
         with:
           name: allure-report
           path: |
-            API-Testing/target/site/allure-maven-plugin/
-            API-Testing/target/allure-results/
+            API_Testing/target/site/allure-maven-plugin/
+            API_Testing/target/allure-results/
           retention-days: 30
         continue-on-error: true
 
