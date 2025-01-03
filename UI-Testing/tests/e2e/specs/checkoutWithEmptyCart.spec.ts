@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../../helpers/loginHelper';
-import { CartPage } from '../../pages/cart.page';
+import { login } from '../helpers/loginHelper';
+import { CartPage } from '../pages/cart.page';
 
 test.describe('Checkout with Empty Cart', () => {
     test.beforeEach(async ({ page }) => {

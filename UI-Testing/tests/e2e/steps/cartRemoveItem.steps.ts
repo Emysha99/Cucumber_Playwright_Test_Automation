@@ -28,7 +28,8 @@ Then('I should see the item in the cart', async function () {
 
 When('I remove the item from the cart', async function () {
   const cartPage = new CartPage(this.getPage());
-  await cartPage.removeFirstItemFromCart();
+  const itemName = await this.page.locator('.cart_item .inventory_item_name').first().innerText();
+  await cartPage.removeItem(itemName);
 });
 
 Then('the item should be removed from the cart', async function () {

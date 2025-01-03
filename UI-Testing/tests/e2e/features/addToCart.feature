@@ -1,9 +1,5 @@
- Feature: Add to Cart Functionality
-
-  Background:
+Feature: Add to Cart
+  Scenario: Add item to cart
     Given I am logged in
-
-  Scenario: Can add an item to the cart
-    When I navigate to the inventory page
-    And I add the first item to the cart
-    Then I should see the item in the cart
+    When I add "Sauce Labs Backpack" to the cart
+    Then I should see "Sauce Labs Backpack" in the cart

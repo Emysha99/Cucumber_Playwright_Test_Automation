@@ -32,4 +32,9 @@ export class CartPage {
   async viewCart() {
     await this.page.click('.shopping_cart_link');
   }
+
+  async isCheckoutButtonDisabled(): Promise<boolean> {
+    const checkoutButton = this.page.locator('#checkout');
+    return await checkoutButton.isDisabled();
+  }
 }

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../../helpers/loginHelper';
-import { ProductPage } from '../../pages/product.page';
-import { CartPage } from '../../pages/cart.page';
+import { login } from '../helpers/loginHelper';
+import { ProductPage } from '../pages/product.page';
+import { CartPage } from '../pages/cart.page';
 
 test.describe('Invalid Cart Limit Test', () => {
   test.beforeEach(async ({ page }) => {

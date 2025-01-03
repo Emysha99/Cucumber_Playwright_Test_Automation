@@ -1,9 +1,9 @@
-import { When, Then } from '@cucumber/cucumber';
+import { Given, When, Then } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
 import { CartPage } from '../pages/cart.page';
 
 When('I add {string} to the cart', async function(itemName: string) {
-  const cartPage = new CartPage(this.page);
+  const cartPage = new CartPage(this.getPage());
   await cartPage.addToCart(itemName);
 });
 
