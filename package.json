@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "test": "cucumber-js -p default",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@cucumber/cucumber": "^8.0.0",
+    "@playwright/test": "^1.39.0"
+  }
+} 

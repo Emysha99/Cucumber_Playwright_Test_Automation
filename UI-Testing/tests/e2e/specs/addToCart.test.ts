@@ -1,12 +1,13 @@
 import { test, expect } from '@playwright/test';
-import { login } from './loginHelper';
+import { login } from '../helpers/loginHelper';
 
-test.describe('Cart Item Removal', () => {
+test.describe('Add to Cart Functionality', () => {
     test.beforeEach(async ({ page }) => {
+        // Perform login before each test
         await login(page);
     });
 
-    test('Remove an item from the cart', async ({ page }) => {
+    test('Can add an item to the cart', async ({ page }) => {
         // Navigate to the inventory page
         await page.goto('https://www.saucedemo.com/v1/inventory.html');
 
@@ -24,18 +25,10 @@ test.describe('Cart Item Removal', () => {
         const cartItem = page.locator('.cart_item .inventory_item_name');
         await expect(cartItem).toHaveText(itemName);
         console.log(`Verified item in cart: ${itemName}`);
-
-        // Click the "Remove" button
-        const removeButton = page.locator('.cart_item button:text("Remove")');
-        await removeButton.click();
-        console.log(`Clicked "Remove" button for item: ${itemName}`);
-
-        // Verify the item is removed
-        await expect(cartItem).toHaveCount(0);
-        console.log(`Verified item was removed from the cart.`);
     });
 
     test.afterEach(async ({ page }) => {
+        // Clear cookies after each test to reset the session
         await page.context().clearCookies();
     });
 });

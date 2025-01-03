@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from './loginHelper';
+import { login } from '../helpers/loginHelper';
 
 test.describe('Add Multiple Items to Cart', () => {
     test.beforeEach(async ({ page }) => {

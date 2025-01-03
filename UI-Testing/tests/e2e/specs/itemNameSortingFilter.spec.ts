@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { login } from './loginHelper';
+import { login } from '../helpers/loginHelper';
 
 // Helper function to extract item names as an array of strings
 async function getItemNames(page: Page): Promise<string[]> {
