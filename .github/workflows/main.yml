@@ -2,9 +2,9 @@ name: Playwright Tests with Allure Report
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ 204165T-2 ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ 204165T-2 ]
   workflow_dispatch:
 
 permissions:
@@ -21,49 +21,49 @@ jobs:
         working-directory: UI-Testing
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'yarn'
-        cache-dependency-path: 'UI-Testing/yarn.lock'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+          cache-dependency-path: 'UI-Testing/yarn.lock'
 
-    - name: Install dependencies
-      run: yarn install
+      - name: Install dependencies
+        run: yarn install
 
-    - name: Install Playwright browsers
-      run: npx playwright install --with-deps
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
 
-    - name: Run Playwright tests
-      run: yarn test
-      continue-on-error: true  # This ensures the workflow continues even if tests fail
+      - name: Run Playwright tests
+        run: yarn test
+        continue-on-error: true  # This ensures the workflow continues even if tests fail
 
-    - name: Generate Allure Report
-      run: yarn allure:generate
-      if: always()  # This ensures report is generated even if tests fail
+      - name: Generate Allure Report
+        run: yarn allure:generate
+        if: always()  # This ensures report is generated even if tests fail
 
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-      if: always()
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        if: always()
 
-    - name: Upload Allure Report
-      uses: actions/upload-pages-artifact@v3
-      if: always()
-      with:
-        path: UI-Testing/allure-report
+      - name: Upload Allure Report
+        uses: actions/upload-pages-artifact@v3
+        if: always()
+        with:
+          path: UI-Testing/allure-report  # Ensure this path is correct
 
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
-      if: always()
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        if: always()
