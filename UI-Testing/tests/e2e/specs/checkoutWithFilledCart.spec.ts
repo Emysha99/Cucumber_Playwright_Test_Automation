@@ -5,6 +5,7 @@ import { login } from '../helpers/loginHelper';
 
 test.describe('Checkout with Filled Cart', () => {
     test('Complete checkout process', async ({ page }) => {
+        // Login and wait for page load
         await login(page);
         await page.waitForLoadState('networkidle');
         
@@ -13,20 +14,19 @@ test.describe('Checkout with Filled Cart', () => {
         await inventoryPage.navigate();
         await inventoryPage.addFirstItemToCart();
         
-        // Go to cart using cart icon instead of direct navigation
+        // Wait for cart badge and navigate to cart
+        await page.waitForSelector('.shopping_cart_badge');
         const cartPage = new CartPage(page);
         await cartPage.viewCart();
         
-        // Complete checkout process
+        // Complete checkout process with waits between steps
         await cartPage.checkout();
-        await page.waitForLoadState('networkidle');
         
         await cartPage.fillCheckoutInfo('John', 'Doe', '12345');
-        await page.waitForLoadState('networkidle');
         
         await cartPage.finishCheckout();
-        await page.waitForLoadState('networkidle');
         
+        // Verify completion
         expect(await cartPage.isCheckoutComplete()).toBeTruthy();
     });
 }); 

@@ -22,7 +22,8 @@ export class CartPage {
   }
 
   async checkout() {
-    await this.page.click('#checkout');
+    await this.page.click('.checkout_button');
+    await this.page.waitForLoadState('networkidle');
   }
 
   async addToCart(itemName: string) {
@@ -41,18 +42,21 @@ export class CartPage {
   }
 
   async fillCheckoutInfo(firstName: string, lastName: string, zipCode: string) {
-    await this.page.fill('#first-name', firstName);
-    await this.page.fill('#last-name', lastName);
-    await this.page.fill('#postal-code', zipCode);
+    await this.page.fill('[data-test="firstName"]', firstName);
+    await this.page.fill('[data-test="lastName"]', lastName);
+    await this.page.fill('[data-test="postalCode"]', zipCode);
     await this.page.click('.cart_button');  // Continue button
+    await this.page.waitForLoadState('networkidle');
   }
 
   async finishCheckout() {
-    await this.page.click('.cart_button');  // Finish button
+    await this.page.click('.cart_button:has-text("Finish")');  // Finish button
+    await this.page.waitForLoadState('networkidle');
   }
 
   async isCheckoutComplete(): Promise<boolean> {
-    return await this.page.locator('.complete-header').isVisible();
+    await this.page.waitForSelector('.complete-header', { state: 'visible' });
+    return true;
   }
 
   async getCartItems(): Promise<string[]> {
