@@ -4,7 +4,8 @@ export class CartPage {
   constructor(private page: Page) {}
 
   async navigate() {
-    await this.page.goto('https://www.saucedemo.com/cart.html');
+    await this.page.goto('https://www.saucedemo.com/v1/cart.html');
+    await this.page.waitForLoadState('networkidle');
   }
 
   async getCartItemCount(): Promise<number> {
@@ -21,7 +22,8 @@ export class CartPage {
   }
 
   async checkout() {
-    await this.page.click('#checkout');
+    await this.page.click('.checkout_button');
+    await this.page.waitForLoadState('networkidle');
   }
 
   async addToCart(itemName: string) {
@@ -31,10 +33,33 @@ export class CartPage {
 
   async viewCart() {
     await this.page.click('.shopping_cart_link');
+    await this.page.waitForURL('**/cart.html');
   }
 
   async isCheckoutButtonDisabled(): Promise<boolean> {
     const checkoutButton = this.page.locator('#checkout');
     return await checkoutButton.isDisabled();
+  }
+
+  async fillCheckoutInfo(firstName: string, lastName: string, zipCode: string) {
+    await this.page.fill('[data-test="firstName"]', firstName);
+    await this.page.fill('[data-test="lastName"]', lastName);
+    await this.page.fill('[data-test="postalCode"]', zipCode);
+    await this.page.click('.cart_button');  // Continue button
+    await this.page.waitForLoadState('networkidle');
+  }
+
+  async finishCheckout() {
+    await this.page.click('.cart_button:has-text("Finish")');  // Finish button
+    await this.page.waitForLoadState('networkidle');
+  }
+
+  async isCheckoutComplete(): Promise<boolean> {
+    await this.page.waitForSelector('.complete-header', { state: 'visible' });
+    return true;
+  }
+
+  async getCartItems(): Promise<string[]> {
+    return await this.page.locator('.cart_item .inventory_item_name').allTextContents();
   }
 }
