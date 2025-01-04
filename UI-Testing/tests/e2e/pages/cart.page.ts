@@ -4,7 +4,8 @@ export class CartPage {
   constructor(private page: Page) {}
 
   async navigate() {
-    await this.page.goto('https://www.saucedemo.com/v1/cart.html');
+    await this.page.click('.shopping_cart_link');
+    await this.page.waitForURL('**/cart.html');
   }
 
   async getCartItemCount(): Promise<number> {
@@ -21,7 +22,7 @@ export class CartPage {
   }
 
   async checkout() {
-    await this.page.click('#checkout');
+    await this.page.click('.checkout_button');
   }
 
   async addToCart(itemName: string) {
@@ -40,5 +41,20 @@ export class CartPage {
 
   async getCartItems(): Promise<string[]> {
     return await this.page.locator('.cart_item .inventory_item_name').allTextContents();
+  }
+
+  async fillCheckoutInfo(firstName: string, lastName: string, zipCode: string) {
+    await this.page.fill('#first-name', firstName);
+    await this.page.fill('#last-name', lastName);
+    await this.page.fill('#postal-code', zipCode);
+    await this.page.click('.cart_button');
+  }
+
+  async finishCheckout() {
+    await this.page.click('.cart_button');
+  }
+
+  async isCheckoutComplete(): Promise<boolean> {
+    return await this.page.locator('.complete-header').isVisible();
   }
 }
