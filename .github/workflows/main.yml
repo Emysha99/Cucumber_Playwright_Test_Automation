@@ -2,9 +2,9 @@ name: Combined UI and API Testing
 
 on:
   push:
-    branches: [ "204165T-2" ]
+    branches: [ "dev-2" ]
   pull_request:
-    branches: [ "204165T-2" ]
+    branches: [ "dev-2" ]
   workflow_dispatch:
 
 permissions:
