@@ -45,16 +45,13 @@ jobs:
         env:
           CI: true
 
-      - name: Generate UI Allure Report
-        run: yarn allure:generate
-        if: always()
-
+      # Don't generate report here, just save results
       - name: Upload UI Test Results
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: ui-allure-results
-          path: UI-Testing/allure-report
+          path: UI-Testing/allure-results
           retention-days: 30
 
   api-testing:
@@ -71,6 +68,13 @@ jobs:
           java-version: '20'
           distribution: 'temurin'
           cache: maven
+
+      - name: Create Allure Directories
+        working-directory: API_Testing
+        run: |
+          mkdir -p target/allure-results
+          chmod -R 777 target
+        continue-on-error: true
 
       - name: Build with Maven
         working-directory: API_Testing
@@ -97,21 +101,16 @@ jobs:
         run: mvn test
         continue-on-error: true
 
-      - name: Generate API Allure Report
-        if: always()
-        working-directory: API_Testing
-        run: mvn allure:report
-        continue-on-error: true
-
+      # Don't generate report here, just save results
       - name: Upload API Test Results
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: api-allure-results
-          path: API_Testing/target/site/allure-maven-plugin
+          path: API_Testing/target/allure-results
           retention-days: 30
 
-  combine-reports:
+  generate-report:
     needs: [ui-testing, api-testing]
     runs-on: ubuntu-latest
     environment:
@@ -119,29 +118,61 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Allure CLI
+        run: |
+          curl -o allure-2.24.0.tgz -OLs https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.24.0/allure-commandline-2.24.0.tgz
+          tar -zxvf allure-2.24.0.tgz -C /tmp
+          sudo ln -s /tmp/allure-2.24.0/bin/allure /usr/local/bin/allure
+
+      - name: Create Directories
+        run: |
+          mkdir -p allure-results
+          mkdir -p allure-report
+          mkdir -p .allure
+
+      # Copy any necessary Allure configurations
+      - name: Copy Allure Configs
+        run: |
+          if [ -f "API_Testing/src/test/resources/allure.properties" ]; then
+            cp API_Testing/src/test/resources/allure.properties .allure/
+          fi
+          if [ -f "UI-Testing/allure.properties" ]; then
+            cp UI-Testing/allure.properties .allure/
+          fi
+
       - name: Download UI Results
         uses: actions/download-artifact@v3
         with:
           name: ui-allure-results
-          path: combined-report/ui
+          path: allure-results/ui
 
       - name: Download API Results
         uses: actions/download-artifact@v3
         with:
           name: api-allure-results
-          path: combined-report/api
+          path: allure-results/api
 
-      - name: Combine Reports
+      - name: Debug Directory Structure
         run: |
-          mkdir -p combined-report/merged
-          echo "<html><head><title>Combined Test Reports</title></head><body>" > combined-report/merged/index.html
-          echo "<h1>Combined Test Reports</h1>" >> combined-report/merged/index.html
-          echo "<h2><a href='ui/'>UI Test Report</a></h2>" >> combined-report/merged/index.html
-          echo "<h2><a href='api/'>API Test Report</a></h2>" >> combined-report/merged/index.html
-          echo "</body></html>" >> combined-report/merged/index.html
-          cp -r combined-report/ui combined-report/merged/ui
-          cp -r combined-report/api combined-report/merged/api
-          touch combined-report/merged/.nojekyll
+          echo "Current directory structure:"
+          ls -R allure-results/
+          echo "UI Results:"
+          ls -la allure-results/ui || echo "No UI results"
+          echo "API Results:"
+          ls -la allure-results/api || echo "No API results"
+
+      - name: Merge Results
+        run: |
+          mkdir -p allure-results/merged
+          cp -r allure-results/ui/* allure-results/merged/ || true
+          cp -r allure-results/api/* allure-results/merged/ || true
+
+      - name: Generate Combined Report
+        run: |
+          allure generate allure-results/merged -o allure-report --clean
+          touch allure-report/.nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v3
@@ -149,7 +180,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: combined-report/merged
+          path: allure-report
 
       - name: Deploy to GitHub Pages
         id: deployment
@@ -160,4 +191,4 @@ jobs:
         if: always()
         run: |
           echo "Test execution completed"
-          echo "Combined report should be available at: ${{ steps.deployment.outputs.page_url }}"
+          echo "Combined Allure report should be available at: ${{ steps.deployment.outputs.page_url }}"
