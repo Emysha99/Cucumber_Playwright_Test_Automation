@@ -6,7 +6,8 @@
   "scripts": {
     "test": "playwright test",
     "build": "tsc",
-    "cucumber": "cucumber-js"
+    "cucumber": "cucumber-js",
+    "allure:generate": "allure generate allure-results -o allure-report --clean"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1",
