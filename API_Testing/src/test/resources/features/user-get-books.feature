@@ -11,3 +11,7 @@ Feature: Get Books API
     When I request a book with ID "1"
     Then I should see the book information
 #    this is not permitted operation for user role "user". so this fails
+
+  Scenario: Get non-existent book
+    When I request a book with ID "999"
+    Then I should see a 404 error message
