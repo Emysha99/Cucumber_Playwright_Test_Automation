@@ -9,9 +9,10 @@ test.describe('Product Details', () => {
     const inventoryPage = new InventoryPage(page);
     await inventoryPage.navigate();
     
-    const productPage = new ProductPage(page);
-    await inventoryPage.getFirstItemName();
+    // Click the first product name to navigate to details
+    await page.click('.inventory_item_name');
     
+    const productPage = new ProductPage(page);
     const isOnDetailsPage = await productPage.isOnProductDetailsPage();
     expect(isOnDetailsPage).toBeTruthy();
     

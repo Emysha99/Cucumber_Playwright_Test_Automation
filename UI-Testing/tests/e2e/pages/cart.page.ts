@@ -4,7 +4,7 @@ export class CartPage {
   constructor(private page: Page) {}
 
   async navigate() {
-    await this.page.goto('https://www.saucedemo.com/cart.html');
+    await this.page.goto('https://www.saucedemo.com/v1/cart.html');
   }
 
   async getCartItemCount(): Promise<number> {
@@ -36,5 +36,9 @@ export class CartPage {
   async isCheckoutButtonDisabled(): Promise<boolean> {
     const checkoutButton = this.page.locator('#checkout');
     return await checkoutButton.isDisabled();
+  }
+
+  async getCartItems(): Promise<string[]> {
+    return await this.page.locator('.cart_item .inventory_item_name').allTextContents();
   }
 }
