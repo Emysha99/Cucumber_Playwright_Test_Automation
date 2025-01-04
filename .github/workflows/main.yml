@@ -30,8 +30,29 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: 'UI-Testing/yarn.lock'
 
+      - name: Create Allure Results Directory
+        run: |
+          mkdir -p allure-results
+          chmod -R 777 allure-results
+
       - name: Install dependencies
-        run: yarn install
+        run: |
+          yarn install
+          yarn add -D @playwright/test allure-playwright
+
+      - name: Update Playwright Config
+        run: |
+          echo "
+          import { defineConfig } from '@playwright/test';
+          export default defineConfig({
+            reporter: [['line'], ['allure-playwright']],
+            use: {
+              headless: true,
+              viewport: { width: 1280, height: 720 },
+              ignoreHTTPSErrors: true,
+              screenshot: 'only-on-failure',
+            },
+          });" > playwright.config.ts
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
@@ -45,7 +66,12 @@ jobs:
         env:
           CI: true
 
-      # Don't generate report here, just save results
+      - name: Debug Allure Results
+        if: always()
+        run: |
+          echo "Checking allure-results directory:"
+          ls -la allure-results/
+
       - name: Upload UI Test Results
         if: always()
         uses: actions/upload-artifact@v3
