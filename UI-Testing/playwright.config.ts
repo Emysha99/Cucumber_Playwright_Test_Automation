@@ -1,6 +1,6 @@
-import { PlaywrightTestConfig } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
-const config: PlaywrightTestConfig = {
+export default defineConfig({
     use: {
         headless: false,
         viewport: { width: 1280, height: 720 },
@@ -8,10 +8,5 @@ const config: PlaywrightTestConfig = {
         screenshot: 'only-on-failure',
     },
     timeout: 30000,
-    reporter: [
-        ['line'],
-        ['allure-playwright']
-    ]
-};
-
-export default config;
+    reporter: 'html'
+});

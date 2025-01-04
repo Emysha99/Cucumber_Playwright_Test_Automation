@@ -6,18 +6,14 @@
   "scripts": {
     "test": "playwright test",
     "build": "tsc",
-    "cucumber": "cucumber-js",
-    "allure:generate": "npx allure generate allure-results --clean",
-    "allure:open": "npx allure open allure-report"
+    "cucumber": "cucumber-js"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "^8.0.0",
     "@playwright/test": "^1.49.1",
-    "@types/node": "^20.0.0",
-    "allure-commandline": "^2.13.8",
-    "allure-playwright": "^3.0.7",
     "playwright": "^1.49.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "@cucumber/cucumber": "^8.0.0",
+    "@types/node": "^20.0.0"
   }
 }

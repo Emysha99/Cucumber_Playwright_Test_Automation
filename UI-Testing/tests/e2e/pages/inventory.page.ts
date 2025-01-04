@@ -16,11 +16,9 @@ export class InventoryPage {
     }
 
     async addMultipleItemsToCart(count: number) {
-        const addButtons = await this.page.$$('button:has-text("Add to cart")');
-        for (let i = 0; i < Math.min(count, addButtons.length); i++) {
-            await addButtons[i].click();
-            // Wait for cart badge to update
-            await this.page.waitForSelector(`.shopping_cart_badge:has-text("${i + 1}")`);
+        const addToCartButtons = this.page.locator('button:text("Add to cart")');
+        for (let i = 0; i < count; i++) {
+            await addToCartButtons.nth(i).click();
         }
     }
 
@@ -30,25 +28,5 @@ export class InventoryPage {
 
     async getAllItemNames(): Promise<string[]> {
         return await this.page.locator('.inventory_item_name').allTextContents();
-    }
-
-    async getAllItemPrices(): Promise<number[]> {
-        const priceElements = await this.page.$$('.inventory_item_price');
-        return Promise.all(
-            priceElements.map(async (element) => {
-                const priceText = await element.textContent() || '';
-                return parseFloat(priceText.replace('$', ''));
-            })
-        );
-    }
-
-    async getCartBadgeCount(): Promise<number> {
-        try {
-            const badge = await this.page.locator('.shopping_cart_badge');
-            const text = await badge.innerText();
-            return parseInt(text);
-        } catch {
-            return 0;
-        }
     }
 }
