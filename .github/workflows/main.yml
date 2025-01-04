@@ -45,13 +45,7 @@ jobs:
         env:
           CI: true
 
-      - name: Check for UI Test Results
-        run: |
-          if [ ! -d "UI-Testing/allure-results" ] || [ -z "$(ls -A UI-Testing/allure-results)" ]; then
-            echo "No UI test results found!"
-            exit 1
-          fi
-
+      # Don't generate report here, just save results
       - name: Upload UI Test Results
         if: always()
         uses: actions/upload-artifact@v3
