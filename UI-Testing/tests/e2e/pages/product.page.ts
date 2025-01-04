@@ -15,4 +15,16 @@ export class ProductPage {
     const product = this.page.locator('.inventory_item').filter({ hasText: productName });
     await product.locator('text=Add to cart').click();
   }
+
+  async isOnProductDetailsPage(): Promise<boolean> {
+    return await this.page.locator('.inventory_details').isVisible();
+  }
+
+  async getProductDetails() {
+    return {
+      name: await this.page.locator('.inventory_details_name').innerText(),
+      description: await this.page.locator('.inventory_details_desc').innerText(),
+      price: await this.page.locator('.inventory_details_price').innerText()
+    };
+  }
 }

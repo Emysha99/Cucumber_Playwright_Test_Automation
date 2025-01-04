@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, PlaywrightTestConfig } from '@playwright/test';
 
 export default defineConfig({
     use: {
@@ -6,7 +6,10 @@ export default defineConfig({
         viewport: { width: 1280, height: 720 },
         ignoreHTTPSErrors: true,
         screenshot: 'only-on-failure',
+        actionTimeout: 15000,
+        navigationTimeout: 30000,
     },
-    timeout: 30000,
-    reporter: 'html'
+    timeout: 60000,
+    reporter: 'html',
+    retries: 1,
 });

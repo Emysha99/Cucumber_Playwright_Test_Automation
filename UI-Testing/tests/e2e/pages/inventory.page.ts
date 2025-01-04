@@ -29,4 +29,14 @@ export class InventoryPage {
     async getAllItemNames(): Promise<string[]> {
         return await this.page.locator('.inventory_item_name').allTextContents();
     }
+
+    async getAllItemPrices(): Promise<number[]> {
+        const priceElements = await this.page.$$('.inventory_item_price');
+        return Promise.all(
+            priceElements.map(async (element) => {
+                const priceText = await element.textContent() || '';
+                return parseFloat(priceText.replace('$', ''));
+            })
+        );
+    }
 }
